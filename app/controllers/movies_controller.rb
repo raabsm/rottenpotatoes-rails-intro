@@ -12,12 +12,9 @@ class MoviesController < ApplicationController
     ratings = params[:ratings]
     sort = params[:sort]
     
-    if not params.has_key? :ratings and not params.has_key? :sort and not params.has_key? "commit"
-      if session.has_key? :ratings
-        ratings = session[:ratings]
-      end
-      if session.has_key? :sort
-        sort = session[:sort]
+    if session.has_key? :ratings or session.has_key? :sort
+      if not params.has_key? :ratings and not params.has_key? :sort and not params.has_key? "commit"
+        redirect_to movies_path(:ratings => session[:ratings], :sort => session[:sort])
       end
     end
     
@@ -26,7 +23,7 @@ class MoviesController < ApplicationController
       @ratings_to_show = ratings.keys
     else
       @movies = Movie.with_ratings(nil)
-      @ratings_to_show = []
+      @ratings_to_show = Movie.all_ratings()
     end
     
     if sort != nil
