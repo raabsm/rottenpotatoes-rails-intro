@@ -9,16 +9,28 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings()
     
-    if params.has_key? :ratings
-      @movies = Movie.with_ratings(params[:ratings].keys.map(&:downcase))
-      @ratings_to_show = params[:ratings].keys
+    ratings = params[:ratings]
+    sort = params[:sort]
+    
+    if not params.has_key? :ratings and not params.has_key? :sort and not params.has_key? "commit"
+      if session.has_key? :ratings
+        ratings = session[:ratings]
+      end
+      if session.has_key? :sort
+        sort = session[:sort]
+      end
+    end
+    
+    if ratings != nil
+      @movies = Movie.with_ratings(ratings.keys.map(&:downcase))
+      @ratings_to_show = ratings.keys
     else
       @movies = Movie.with_ratings(nil)
       @ratings_to_show = []
     end
     
-    if params.has_key? :sort
-      if params[:sort] == "movie_title"
+    if sort != nil
+      if sort == "movie_title"
         @movies = @movies.sort_by("title")
         @title_header = "hilite text-success"
       else 
@@ -26,6 +38,9 @@ class MoviesController < ApplicationController
         @release_date_header = "hilite text-success"
       end
     end
+    
+    session[:ratings] = ratings
+    session[:sort] = sort
   end
 
   def new
