@@ -11,4 +11,8 @@ class Movie < ActiveRecord::Base
     return where("lower(rating) IN (?)", ratings)
   end
   
+  def self.sort_by(column)
+    return order(column)
+  end
+  
 end
